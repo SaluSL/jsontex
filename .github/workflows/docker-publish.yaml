@@ -1,0 +1,37 @@
+name: Build and Publish Docker image
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push jsontex image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./doc-converter
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/jsontex:latest
+
+      - name: Build and push demo-app image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./demo-app
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/jsontex-demo-app:latest
