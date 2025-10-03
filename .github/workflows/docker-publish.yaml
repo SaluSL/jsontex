@@ -12,6 +12,11 @@ jobs:
       packages: write
 
     steps:
+      - name: set lower case repository owner
+        run: echo "REPOSITORY_OWNER_LOWERCASE=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+        env:
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -27,11 +32,11 @@ jobs:
         with:
           context: ./doc-converter
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/jsontex:latest
+          tags: ghcr.io/${{ env.REPOSITORY_OWNER_LOWERCASE }}/jsontex:latest
 
       - name: Build and push demo-app image
         uses: docker/build-push-action@v5
         with:
           context: ./demo-app
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/jsontex-demo-app:latest
+          tags: ghcr.io/${{ env.REPOSITORY_OWNER_LOWERCASE }}/jsontex-demo-app:latest
